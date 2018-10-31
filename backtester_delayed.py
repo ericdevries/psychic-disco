@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 def doBacktest(startDate, endDate, currencyFilter=None):
     records = data.getLinearData()
-
+    
     bitcoinusd = records['btc']
     del records['btc']
 
@@ -15,6 +15,7 @@ def doBacktest(startDate, endDate, currencyFilter=None):
     records = records.swapaxes(0, 1)
     records = records[startDate:endDate]
     bitcoinusd = bitcoinusd[startDate:endDate]
+
     date = records.items[-1]
 
     balancer = Balancer(currencies, bitcoinusd)
@@ -71,10 +72,10 @@ class Balancer():
                 self.orders += 1
                 self.debug('sold %s %s at %s' % (amount, currency, price,))
                 #self.performance[currency] += (price * amount * self.fee * btcusd)
-
+                
             else:
                 self.failedorders += 1
-
+            
         # cancel remaining orders
         self.sellorders = []
 
@@ -238,7 +239,6 @@ class Balancer():
         total = 0
 
         for k, v in self.buyandhold.items():
-           # import pdb; pdb.set_trace()
             price = v * prices.loc[k, 'C']
             total += price
 
@@ -255,13 +255,10 @@ class Balancer():
             amount = price * v * btc
             total += amount
 
-            #print('%s \t - %s' % (k, v))
+            print('%s \t - %s' % (k, v))
 
         print('(%s, %s, %s, %s) -> grand total: %s (bh: %s)' % (self.cutoff, self.selloff, self.buyin, self.sellamount, total, self.buyandholdResult*btc,))
 
-        #self.printPerformance(date)
-
-        #import pdb; pdb.set_trace()
 
     def printPerformance(self, date):
         btc = self.btc.loc[date, 'C']
@@ -281,10 +278,10 @@ class Balancer():
 
 
 if __name__ == '__main__':
-    balancer, date = doBacktest('2017-07-01', '2017-12-31', ['btc', 'xmr', 'ltc', 'xrp', 'xlm', 'eth', 'dash', 'neo'])
+    currencies = ['btc', 'xmr', 'ltc', 'xrp', 'xlm', 'eth', 'dash', 'neo']
+
+    balancer, date = doBacktest('2018-06-01', '2018-10-30', currencies)
     balancer.printValues(date)
-
-
     balancer = Balancer(currencies, bitcoinusd)
     balancer.balance(records)
     balancer.printValues(date)
